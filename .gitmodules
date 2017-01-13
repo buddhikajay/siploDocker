@@ -4,3 +4,6 @@
 [submodule "draw"]
 	path = draw
 	url = https://github.com/buddhikajay/draw.git
+[submodule "signalmaster"]
+	path = signalmaster
+	url = https://github.com/buddhikajay/signalmaster.git
