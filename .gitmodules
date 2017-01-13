@@ -1,0 +1,6 @@
+[submodule "SiploELearning"]
+	path = SiploELearning
+	url = https://github.com/buddhikajay/SiploELearning.git
+[submodule "draw"]
+	path = draw
+	url = https://github.com/buddhikajay/draw.git
