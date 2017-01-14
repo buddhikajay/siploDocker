@@ -27,6 +27,7 @@ services:
         links:
             - php
             - whiteboard
+            - mediaserver
         volumes_from:
             - php
         volumes:
@@ -65,3 +66,7 @@ services:
             DB_HOST: db
             DB_NAME: ${MYSQL_DATABASE}
         tty: true
+    media:
+        build: signalmaster
+        ports:
+            - "8888:8888"
