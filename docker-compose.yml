@@ -26,6 +26,7 @@ services:
             - 80:80
         links:
             - php
+            - whiteboard
         volumes_from:
             - php
         volumes:
@@ -53,7 +54,7 @@ services:
         image: redis:alpine
         ports:
             - 6380:6379
-    draw:
+    whiteboard:
         build: draw
         ports:
             - 9002:9002

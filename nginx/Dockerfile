@@ -7,8 +7,10 @@ RUN apt-get update && apt-get install -y \
 
 ADD nginx.conf /etc/nginx/
 ADD siplo.conf /etc/nginx/sites-available/
+ADD whiteboard.conf /etc/nginx/sites-available/
 
 RUN ln -s /etc/nginx/sites-available/siplo.conf /etc/nginx/sites-enabled/siplo
+RUN ln -s /etc/nginx/sites-available/whiteboard.conf /etc/nginx/sites-enabled/whiteboard
 RUN rm /etc/nginx/sites-enabled/default
 
 RUN echo "upstream php-upstream { server php:9000; }" > /etc/nginx/conf.d/upstream.conf
