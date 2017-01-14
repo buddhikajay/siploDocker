@@ -66,6 +66,7 @@ services:
             - 6380:6379
     whiteboard:
         build: draw
+        container_name: whiteboard
         ports:
             - 9002:9002
         environment:
@@ -78,5 +79,8 @@ services:
         tty: true
     media:
         build: signalmaster
+        container_name: media
         ports:
             - "8888:8888"
+        environment:
+            VIRTUAL_HOST: media.siplo.dev
