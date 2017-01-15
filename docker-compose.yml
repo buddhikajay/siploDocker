@@ -11,6 +11,13 @@ services:
             MYSQL_DATABASE: ${MYSQL_DATABASE}
             MYSQL_USER: ${MYSQL_USER}
             MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+            WHITEBOARD_DB_USER: ${WHITEBOARD_DB_USER}
+            WHITEBOARD_DB_NAME: ${WHITEBOARD_DB_NAME}
+            WHITEBOARD_DB_PASSWORD: ${WHITEBOARD_DB_PASSWORD}
+            COTURN_DB_USER: ${COTURN_DB_USER}
+            COTURN_DB_NAME: ${COTURN_DB_NAME}
+            COTURN_DB_PASSWORD: ${COTURN_DB_PASSWORD}
+
     php:
         build: php7-fpm
         ports:
@@ -73,11 +80,11 @@ services:
         ports:
             - 9002:9002
         environment:
-            DB_TYPE: dirty
-            DB_USER: ${MYSQL_USER}
-            DB_PASSWORD: ${MYSQL_PASSWORD}
+            DB_TYPE: mysql
+            DB_USER: ${WHITEBOARD_DB_USER}
+            DB_PASSWORD: ${WHITEBOARD_DB_PASSWORD}
             DB_HOST: db
-            DB_NAME: ${MYSQL_DATABASE}
+            DB_NAME: ${WHITEBOARD_DB_NAME}
             VIRTUAL_HOST: whiteboard.siplo.dev
         tty: true
     media:
