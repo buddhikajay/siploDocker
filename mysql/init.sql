@@ -1,0 +1,9 @@
+CREATE DATABASE IF NOT EXISTS siploELearning;
+CREATE DATABASE IF NOT EXISTS whiteboard;
+CREATE DATABASE IF NOT EXISTS coturn;
+
+CREATE USER IF NOT EXISTS 'siplo' IDENTIFIED BY '1234';
+
+GRANT ALL PRIVILEGES ON siploELearning . * TO 'siplo'@'%';
+GRANT ALL PRIVILEGES ON whiteboard . * TO 'siplo'@'%';
+GRANT ALL PRIVILEGES ON coturn . * TO 'siplo'@'%';
