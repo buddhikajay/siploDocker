@@ -7,3 +7,6 @@
 [submodule "signalmaster"]
 	path = signalmaster
 	url = https://github.com/buddhikajay/signalmaster.git
+[submodule "docker-coturn"]
+	path = docker-coturn
+	url = https://github.com/buddhikajay/docker-coturn.git
