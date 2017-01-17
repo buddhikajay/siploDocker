@@ -41,7 +41,7 @@ services:
         volumes:
             - ./logs/nginx/:/var/log/nginx
         environment:
-            - VIRTUAL_HOST=siplo.dev
+            - VIRTUAL_HOST=${DOMAIN_NAME}
     nginx-proxy:
         image: jwilder/nginx-proxy
         container_name: nginx-proxy
@@ -79,22 +79,34 @@ services:
         container_name: whiteboard
         ports:
             - 9002:9002
+        depends_on:
+            - db
         environment:
             DB_TYPE: mysql
             DB_USER: ${WHITEBOARD_DB_USER}
             DB_PASSWORD: ${WHITEBOARD_DB_PASSWORD}
             DB_HOST: db
             DB_NAME: ${WHITEBOARD_DB_NAME}
-            VIRTUAL_HOST: whiteboard.siplo.dev
+            VIRTUAL_HOST: whiteboard.${DOMAIN_NAME}
     media:
         build: signalmaster
         container_name: media
         ports:
             - "8888:8888"
+        depends_on:
+            - coturn
+        links:
+            - coturn
         environment:
-            VIRTUAL_HOST: media.siplo.dev
+            TURNSERVER_HOST: coturn
+            TURNSERVER_SECRET: ${COTURN_SECRET}
+            TURNSERVER_EXPIERY: 86400
+            NODE_ENV: production
+            VIRTUAL_HOST: media.${DOMAIN_NAME}
     coturn:
         build: docker-turnserver
+        depends_on:
+            - db
         container_name: coturn
         ports:
             - "3478:3478/udp" # STUN/TURN UDP
@@ -110,4 +122,8 @@ services:
         links:
             - db
         environment:
-            VIRTUAL_HOST: turn.siplo.dev
+            VIRTUAL_HOST: turn.${DOMAIN_NAME}
+            COTURN_SECRET: ${COTURN_SECRET}
+            COTURN_DB_USER: ${COTURN_DB_USER}
+            COTURN_DB_NAME: ${COTURN_DB_NAME}
+            COTURN_DB_PASSWORD: ${COTURN_DB_PASSWORD}
