@@ -20,7 +20,7 @@ mysql -u root -p${MYSQL_ROOT_PASSWORD} -e "GRANT ALL ON ${WHITEBOARD_DB_NAME}.* 
 
 mysql -u root -p${MYSQL_ROOT_PASSWORD} -e "CREATE DATABASE IF NOT EXISTS ${COTURN_DB_NAME}"
 mysql -u root -p${MYSQL_ROOT_PASSWORD} -e "GRANT ALL ON ${COTURN_DB_NAME}.* to '${COTURN_DB_USER}'@'%' IDENTIFIED BY '${COTURN_DB_PASSWORD}'"
-mysql -u root -p${MYSQL_ROOT_PASSWORD} -e 
+mysql -u root -p${MYSQL_ROOT_PASSWORD} -e \
 "USE ${COTURN_DB_NAME};
 CREATE TABLE turnusers_lt (
     realm varchar(127) default '',
