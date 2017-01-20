@@ -26,7 +26,7 @@ services:
             - db:mysqldb
             - redis
         volumes:
-            - ${SYMFONY_APP_PATH}:/var/www/symfony
+            - ./SiploELearning:/var/www/symfony
             - ./logs/symfony:/var/www/symfony/app/logs
     nginx:
         build: nginx
