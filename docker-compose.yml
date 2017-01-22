@@ -2,10 +2,11 @@ version: '2'
 
 services:
     db:
-        image: mysql
-        volumes:
-            - "./.data/db:/var/lib/mysql"
-            - "./mysql/init.sh:/docker-entrypoint-initdb.d/init.sh"
+        build: mysql
+        image: buddhikajay/siplo-mysql
+        # volumes:
+        #     - "./.data/db:/var/lib/mysql"
+        #     - "./mysql/init.sh:/docker-entrypoint-initdb.d/init.sh"
         environment:
             MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
             MYSQL_DATABASE: ${MYSQL_DATABASE}
