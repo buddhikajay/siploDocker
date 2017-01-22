@@ -20,6 +20,7 @@ services:
 
     php:
         build: php7-fpm
+        image: buddhikajay/php7-fpm
         ports:
             - 9000:9000
         links:
@@ -30,6 +31,7 @@ services:
             - ./logs/symfony:/var/www/symfony/app/logs
     nginx:
         build: nginx
+        image: buddhikajay/nginx
         ports:
             - 83:80
         links:
@@ -76,6 +78,7 @@ services:
             - 6380:6379
     whiteboard:
         build: draw
+        image: buddhikajay/draw
         container_name: whiteboard
         ports:
             - 9002:9002
@@ -90,6 +93,7 @@ services:
             VIRTUAL_HOST: whiteboard.${DOMAIN_NAME}
     media:
         build: signalmaster
+        image: buddhikajay/media
         container_name: media
         ports:
             - "8888:8888"
@@ -105,6 +109,7 @@ services:
             VIRTUAL_HOST: media.${DOMAIN_NAME}
     coturn:
         build: docker-turnserver
+        image: buddhikajay/coturn
         depends_on:
             - db
         container_name: coturn
