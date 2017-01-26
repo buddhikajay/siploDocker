@@ -21,7 +21,7 @@ services:
 
     php:
         build: php7-fpm
-        image: buddhikajay/php7-fpm
+        image: buddhikajay/siplo_e_learning
         ports:
             - 9000:9000
         links:
