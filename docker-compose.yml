@@ -20,16 +20,16 @@ services:
             COTURN_DB_PASSWORD: ${COTURN_DB_PASSWORD}
 
     php:
-        build: php7-fpm
+        build: SiploELearning
         image: buddhikajay/siplo_e_learning
         ports:
             - 9000:9000
         links:
             - db:mysqldb
             - redis
-        volumes:
-            - ./SiploELearning:/var/www/symfony
-            - ./logs/symfony:/var/www/symfony/app/logs
+        # volumes:
+        #     - ./SiploELearning:/var/www/symfony
+        #     - ./logs/symfony:/var/www/symfony/app/logs
     nginx:
         build: nginx
         image: buddhikajay/nginx
