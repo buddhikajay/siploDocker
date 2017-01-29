@@ -37,6 +37,15 @@ RUN echo "xdebug.remote_connect_back=1" >> /usr/local/etc/php/conf.d/docker-php-
 RUN echo "xdebug.idekey=\"PHPSTORM\"" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 RUN echo "xdebug.remote_port=9001" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
+RUN apt-get update && apt-get install -y \
+        libfreetype6-dev \
+        libjpeg62-turbo-dev \
+        libmcrypt-dev \
+        libpng12-dev \
+    && docker-php-ext-install -j$(nproc) iconv mcrypt \
+    && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
+    && docker-php-ext-install -j$(nproc) gd
+
 
 RUN echo 'alias sf="php app/console"' >> ~/.bashrc
 RUN echo 'alias sf3="php bin/console"' >> ~/.bashrc
