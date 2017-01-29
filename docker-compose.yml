@@ -48,6 +48,8 @@ services:
             SYMFONY__PAYHERE__MERCHANT__ID: ${SYMFONY_PAYHERE_MERCHANT_ID}
             SYMFONY__PAYHERE__CHECKOUT__URL: ${SYMFONY_PAYHERE_CHECKOUT_URL}
             SYMFONY__PAYHERE__SECRET: ${SYMFONY_PAYHERE_SECRET}
+            SYMFONY__REDIS__HOST: ${SYMFONY_REDIS_HOST}
+            SYMFONY__REDIS__PORT: ${SYMFONY_REDIS_PORT}
     nginx:
         build: nginx
         image: buddhikajay/nginx
