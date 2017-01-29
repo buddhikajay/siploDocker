@@ -30,6 +30,23 @@ services:
         # volumes:
         #     - ./SiploELearning:/var/www/symfony
         #     - ./logs/symfony:/var/www/symfony/app/logs
+        environment:
+            SYMFONY_DB_HOST: ${SYMFONY_DB_HOST}
+            SYMFONY_DB_PORT: ${SYMFONY_DB_PORT}
+            SYMFONY_DB_USER: ${SYMFONY_DB_USER}
+            SYMFONY_DB_NAME: ${SYMFONY_DB_NAME}
+            SYMFONY_DB_PASSWORD: ${SYMFONY_DB_PASSWORD}
+            SYMFONY_MAILER_TRANSPORT: ${SYMFONY_MAILER_TRANSPORT}
+            SYMFONY_MAILER_HOST: ${SYMFONY_MAILER_HOST}
+            SYMFONY_MAILER_PORT: ${SYMFONY_MAILER_PORT}
+            SYMFONY_MAILER_ENCRYPTION: ${SYMFONY_MAILER_ENCRYPTION}
+            SYMFONY_MAILER_USER: ${SYMFONY_MAILER_USER}
+            SYMFONY_SECRET: ${SYMFONY_SECRET}
+            SYMFONY_DOMAIN_NAME: ${DOMAIN_NAME}
+            SYMFONY_ADMIN_ID: ${SYMFONY_ADMIN_ID}
+            SYMFONY_PAYHERE_MERCHANT_ID: ${SYMFONY_PAYHERE_MERCHANT_ID}
+            SYMFONY_PAYHERE_CHECKOUT_URL: ${SYMFONY_PAYHERE_CHECKOUT_URL}
+            SYMFONY_PAYHERE_SECRET: ${SYMFONY_PAYHERE_SECRET}
     nginx:
         build: nginx
         image: buddhikajay/nginx
