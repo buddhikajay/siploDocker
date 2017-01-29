@@ -93,7 +93,7 @@ services:
             DB_NAME: ${WHITEBOARD_DB_NAME}
             VIRTUAL_HOST: whiteboard.${DOMAIN_NAME}
     media:
-        build: signalmaster
+        # build: signalmaster
         image: buddhikajay/media
         container_name: media
         ports:
@@ -109,7 +109,7 @@ services:
             NODE_ENV: production
             VIRTUAL_HOST: media.${DOMAIN_NAME}
     coturn:
-        build: docker-turnserver
+        # build: docker-turnserver
         image: buddhikajay/coturn
         depends_on:
             - db
