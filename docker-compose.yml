@@ -65,6 +65,9 @@ services:
             - ./logs/nginx/:/var/log/nginx
         environment:
             - VIRTUAL_HOST=${DOMAIN_NAME}
+            - LETSENCRYPT_HOST=${DOMAIN_NAME}
+            - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+            # - LETSENCRYPT_TEST=true
     nginx-proxy:
         image: jwilder/nginx-proxy
         container_name: nginx-proxy
@@ -74,6 +77,9 @@ services:
         volumes:
           - /var/run/docker.sock:/tmp/docker.sock:ro
           - ./certs:/etc/nginx/certs
+          - /etc/nginx/certs
+          - /etc/nginx/vhost.d
+          - /usr/share/nginx/html
     elk:
         image: willdurand/elk
         ports:
@@ -112,6 +118,8 @@ services:
             DB_HOST: db
             DB_NAME: ${WHITEBOARD_DB_NAME}
             VIRTUAL_HOST: whiteboard.${DOMAIN_NAME}
+            LETSENCRYPT_HOST: whiteboard.${DOMAIN_NAME}
+            LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}
     media:
         build: signalmaster
         image: buddhikajay/media
@@ -128,6 +136,8 @@ services:
             TURNSERVER_EXPIERY: 86400
             NODE_ENV: production
             VIRTUAL_HOST: media.${DOMAIN_NAME}
+            LETSENCRYPT_HOST: media.${DOMAIN_NAME}
+            LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}
     coturn:
         build: docker-turnserver
         image: buddhikajay/coturn
@@ -148,8 +158,19 @@ services:
         links:
             - db
         environment:
-            VIRTUAL_HOST: turn.${DOMAIN_NAME}
             COTURN_SECRET: ${COTURN_SECRET}
             COTURN_DB_USER: ${COTURN_DB_USER}
             COTURN_DB_NAME: ${COTURN_DB_NAME}
             COTURN_DB_PASSWORD: ${COTURN_DB_PASSWORD}
+            VIRTUAL_HOST: turn.${DOMAIN_NAME}
+            LETSENCRYPT_HOST: turn.${DOMAIN_NAME}
+            LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}
+    letsencrypt:
+        image: jrcs/letsencrypt-nginx-proxy-companion
+        volumes:
+            # - /path/to/certs:/etc/nginx/certs:rw
+            - /var/run/docker.sock:/var/run/docker.sock:ro
+        volumes_from:
+            - nginx-proxy
+        # environment:
+        #     - LETSENCRYPT_TEST=true
