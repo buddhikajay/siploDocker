@@ -4,9 +4,8 @@ services:
     db:
         build: mysql
         image: buddhikajay/siplo-mysql
-        # volumes:
-        #     - "./.data/db:/var/lib/mysql"
-        #     - "./mysql/init.sh:/docker-entrypoint-initdb.d/init.sh"
+        volumes:
+            - "./.data/db:/var/lib/mysql"
         environment:
             MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
             MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -27,9 +26,9 @@ services:
         links:
             - db:mysqldb
             - redis
-        # volumes:
-        #     - ./SiploELearning:/var/www/symfony
-        #     - ./logs/symfony:/var/www/symfony/app/logs
+        volumes:
+            - ./SiploELearning:/var/www/symfony
+            - ./logs/symfony:/var/www/symfony/app/logs
         environment:
             SYMFONY__DB__HOST: ${SYMFONY_DB_HOST}
             SYMFONY__DB__PORT: ${SYMFONY_DB_PORT}
@@ -67,7 +66,6 @@ services:
             - VIRTUAL_HOST=${DOMAIN_NAME}
             - LETSENCRYPT_HOST=${DOMAIN_NAME}
             - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
-            # - LETSENCRYPT_TEST=true
     nginx-proxy:
         image: jwilder/nginx-proxy
         container_name: nginx-proxy
@@ -169,9 +167,6 @@ services:
     letsencrypt:
         image: jrcs/letsencrypt-nginx-proxy-companion
         volumes:
-            # - /path/to/certs:/etc/nginx/certs:rw
             - /var/run/docker.sock:/var/run/docker.sock:ro
         volumes_from:
             - nginx-proxy
-        # environment:
-        #     - LETSENCRYPT_TEST=true
