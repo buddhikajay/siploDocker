@@ -131,10 +131,10 @@ services:
         links:
             - coturn
         environment:
-            TURNSERVER_HOST: turn:turn.siplo.xyz
+            TURNSERVER_HOST: turn:turn.${DOMAIN_NAME}
             TURNSERVER_SECRET: ${COTURN_SECRET}
-            TURNSERVER_EXPIERY: 86400
-            NODE_ENV: production
+            TURNSERVER_EXPIERY: ${MEDIA_EXPIERY}
+            NODE_ENV: ${MEDIA_ENV}
             VIRTUAL_HOST: media.${DOMAIN_NAME}
             LETSENCRYPT_HOST: media.${DOMAIN_NAME}
             LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}

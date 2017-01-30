@@ -1,5 +1,6 @@
+# buddhikajay/coturn
 FROM phusion/baseimage:0.9.18
-MAINTAINER Brian Prodoehl <bprodoehl@connectify.me>
+MAINTAINER Buddhika Jayawardhana <buddhika.anushka@gmail.com>
 
 # Set correct environment variables.
 ENV HOME /root
