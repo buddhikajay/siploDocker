@@ -163,6 +163,7 @@ services:
             COTURN_DB_NAME: ${COTURN_DB_NAME}
             COTURN_DB_PASSWORD: ${COTURN_DB_PASSWORD}
             VIRTUAL_HOST: turn.${DOMAIN_NAME}
+            VIRTUAL_PORT: 3478
             LETSENCRYPT_HOST: turn.${DOMAIN_NAME}
             LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}
     letsencrypt:
