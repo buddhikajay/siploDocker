@@ -129,9 +129,9 @@ services:
         links:
             - coturn
         environment:
-            TURNSERVER_HOST: turn:turn.${DOMAIN_NAME}
-            TURNSERVER_SECRET: ${COTURN_SECRET}
-            TURNSERVER_EXPIERY: ${MEDIA_EXPIERY}
+            TURNSERVER_HOST: ${MEDIA_TURNSERVER_HOST}
+            TURNSERVER_SECRET: ${MEDIA_TURNSERVER_SECRET}
+            TURNSERVER_EXPIERY: ${MEDIA_TURNSERVER_EXPIERY}
             NODE_ENV: ${MEDIA_ENV}
             VIRTUAL_HOST: media.${DOMAIN_NAME}
             LETSENCRYPT_HOST: media.${DOMAIN_NAME}
