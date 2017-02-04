@@ -45,6 +45,7 @@ services:
             SYMFONY__AWS__REGION: ${SYMFONY_AWS_REGION}
             SYMFONY__AWS__ACCESS__KEY__ID: ${SYMFONY_AWS_ACCESS_KEY_ID}
             SYMFONY__AWS__SECRET__ACCESS__KEY: ${SYMFONY_AWS_SECRET_ACCESS_KEY}
+            SYMFONY__AWS__S3_BUCKET_NAME: ${SYMFONY_AWS_S3_BUCKET_NAME}
     nginx:
         image: buddhikajay/nginx
         ports:
