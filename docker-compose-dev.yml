@@ -49,6 +49,10 @@ services:
             SYMFONY__PAYHERE__SECRET: ${SYMFONY_PAYHERE_SECRET}
             SYMFONY__REDIS__HOST: ${SYMFONY_REDIS_HOST}
             SYMFONY__REDIS__PORT: ${SYMFONY_REDIS_PORT}
+            SYMFONY__AWS__REGION: ${SYMFONY_AWS_REGION}
+            SYMFONY__AWS__ACCESS__KEY__ID: ${SYMFONY_AWS_ACCESS_KEY_ID}
+            SYMFONY__AWS__SECRET__ACCESS__KEY: ${SYMFONY_AWS_SECRET_ACCESS_KEY}
+            SYMFONY__AWS__S3_BUCKET_NAME: ${SYMFONY_AWS_S3_BUCKET_NAME}
     nginx:
         build: nginx
         image: buddhikajay/nginx
