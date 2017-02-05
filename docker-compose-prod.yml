@@ -2,11 +2,7 @@ version: '2'
 
 services:
     db:
-        # build: mysql
         image: buddhikajay/siplo-mysql
-        # volumes:
-        #     - "./.data/db:/var/lib/mysql"
-        #     - "./mysql/init.sh:/docker-entrypoint-initdb.d/init.sh"
         environment:
             MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
             MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -20,16 +16,12 @@ services:
             COTURN_DB_PASSWORD: ${COTURN_DB_PASSWORD}
 
     php:
-        # build: php7-fpm
         image: buddhikajay/siplo_e_learning
         ports:
             - 9000:9000
         links:
             - db:mysqldb
             - redis
-        # volumes:
-        #     - ./SiploELearning:/var/www/symfony
-        #     - ./logs/symfony:/var/www/symfony/app/logs
         environment:
             SYMFONY__DB__HOST: ${SYMFONY_DB_HOST}
             SYMFONY__DB__PORT: ${SYMFONY_DB_PORT}
@@ -48,8 +40,13 @@ services:
             SYMFONY__PAYHERE__MERCHANT__ID: ${SYMFONY_PAYHERE_MERCHANT_ID}
             SYMFONY__PAYHERE__CHECKOUT__URL: ${SYMFONY_PAYHERE_CHECKOUT_URL}
             SYMFONY__PAYHERE__SECRET: ${SYMFONY_PAYHERE_SECRET}
+            SYMFONY__REDIS__HOST: ${SYMFONY_REDIS_HOST}
+            SYMFONY__REDIS__PORT: ${SYMFONY_REDIS_PORT}
+            SYMFONY__AWS__REGION: ${SYMFONY_AWS_REGION}
+            SYMFONY__AWS__ACCESS__KEY__ID: ${SYMFONY_AWS_ACCESS_KEY_ID}
+            SYMFONY__AWS__SECRET__ACCESS__KEY: ${SYMFONY_AWS_SECRET_ACCESS_KEY}
+            SYMFONY__AWS__S3__BUCKET__NAME: ${SYMFONY_AWS_S3_BUCKET_NAME}
     nginx:
-        # build: nginx
         image: buddhikajay/nginx
         ports:
             - 83:80
@@ -59,10 +56,11 @@ services:
             - media
         volumes_from:
             - php
-        # volumes:
-        #     - ./logs/nginx/:/var/log/nginx
         environment:
             - VIRTUAL_HOST=${DOMAIN_NAME}
+            - LETSENCRYPT_HOST=${DOMAIN_NAME}
+            - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+            # - LETSENCRYPT_TEST=true
     nginx-proxy:
         image: jwilder/nginx-proxy
         container_name: nginx-proxy
@@ -71,17 +69,16 @@ services:
           - "443:443"
         volumes:
           - /var/run/docker.sock:/tmp/docker.sock:ro
-          # - ./certs:/etc/nginx/certs
-    # elk:
-    #     image: willdurand/elk
-    #     ports:
-    #         - 81:80
-    #     # volumes:
-    #     #     - ./elk/logstash:/etc/logstash
-    #     #     - ./elk/logstash/patterns:/opt/logstash/patterns
-    #     volumes_from:
-    #         - php
-    #         - nginx
+          - /etc/nginx/certs
+          - /etc/nginx/vhost.d
+          - /usr/share/nginx/html
+    elk:
+        image: willdurand/elk
+        ports:
+            - 81:80
+        volumes_from:
+            - php
+            - nginx
     phpmyadmin:
         image: phpmyadmin/phpmyadmin
         ports:
@@ -96,7 +93,6 @@ services:
         ports:
             - 6380:6379
     whiteboard:
-        # build: draw
         image: buddhikajay/draw
         container_name: whiteboard
         ports:
@@ -110,8 +106,9 @@ services:
             DB_HOST: db
             DB_NAME: ${WHITEBOARD_DB_NAME}
             VIRTUAL_HOST: whiteboard.${DOMAIN_NAME}
+            LETSENCRYPT_HOST: whiteboard.${DOMAIN_NAME}
+            LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}
     media:
-        # build: signalmaster
         image: buddhikajay/media
         container_name: media
         ports:
@@ -121,13 +118,14 @@ services:
         links:
             - coturn
         environment:
-            TURNSERVER_HOST: coturn
-            TURNSERVER_SECRET: ${COTURN_SECRET}
-            TURNSERVER_EXPIERY: 86400
-            NODE_ENV: production
+            TURNSERVER_HOST: ${MEDIA_TURNSERVER_HOST}
+            TURNSERVER_SECRET: ${MEDIA_TURNSERVER_SECRET}
+            TURNSERVER_EXPIERY: ${MEDIA_TURNSERVER_EXPIERY}
+            NODE_ENV: ${MEDIA_ENV}
             VIRTUAL_HOST: media.${DOMAIN_NAME}
+            LETSENCRYPT_HOST: media.${DOMAIN_NAME}
+            LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}
     coturn:
-        # build: docker-turnserver
         image: buddhikajay/coturn
         depends_on:
             - db
@@ -146,8 +144,19 @@ services:
         links:
             - db
         environment:
-            VIRTUAL_HOST: turn.${DOMAIN_NAME}
             COTURN_SECRET: ${COTURN_SECRET}
             COTURN_DB_USER: ${COTURN_DB_USER}
             COTURN_DB_NAME: ${COTURN_DB_NAME}
             COTURN_DB_PASSWORD: ${COTURN_DB_PASSWORD}
+            VIRTUAL_HOST: turn.${DOMAIN_NAME}
+            VIRTUAL_PORT: 3478
+            LETSENCRYPT_HOST: turn.${DOMAIN_NAME}
+            LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}
+    letsencrypt:
+        image: jrcs/letsencrypt-nginx-proxy-companion
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock:ro
+        volumes_from:
+            - nginx-proxy
+        environment:
+            - LETSENCRYPT_TEST=true
