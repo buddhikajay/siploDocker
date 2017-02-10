@@ -6,6 +6,7 @@ services:
         image: buddhikajay/siplo-mysql
         volumes:
             - "./.data/db:/var/lib/mysql"
+            - "./mysql/init.sh:/docker-entrypoint-initdb.d/init.sh"
         environment:
             MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
             MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -166,11 +167,16 @@ services:
             COTURN_DB_PASSWORD: ${COTURN_DB_PASSWORD}
             VIRTUAL_HOST: turn.${DOMAIN_NAME}
             VIRTUAL_PORT: 3478
+            VIRTUAL_PROTO: https
             LETSENCRYPT_HOST: turn.${DOMAIN_NAME}
             LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}
-    letsencrypt:
-        image: jrcs/letsencrypt-nginx-proxy-companion
         volumes:
-            - /var/run/docker.sock:/var/run/docker.sock:ro
-        volumes_from:
-            - nginx-proxy
+            - ./docker-turnserver/turnserver.sh:/etc/service/turnserver/run
+            - ./certs/default_key.pem:/etc/service/turnserver/default_key.pem
+            - ./certs/default_crt.pem:/etc/service/turnserver/default_crt.pem
+    # letsencrypt:
+    #     image: jrcs/letsencrypt-nginx-proxy-companion
+    #     volumes:
+    #         - /var/run/docker.sock:/var/run/docker.sock:ro
+    #     volumes_from:
+    #         - nginx-proxy
