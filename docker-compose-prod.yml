@@ -108,6 +108,7 @@ services:
             - db
         environment:
             DB_TYPE: mysql
+            DB_HOST: ${WHITEBOARD_DB_HOST}
             DB_USER: ${WHITEBOARD_DB_USER}
             DB_PASSWORD: ${WHITEBOARD_DB_PASSWORD}
             DB_HOST: db
@@ -152,6 +153,7 @@ services:
             - db
         environment:
             COTURN_SECRET: ${COTURN_SECRET}
+            COTURN_DB_HOST: ${COTURN_DB_HOST}
             COTURN_DB_USER: ${COTURN_DB_USER}
             COTURN_DB_NAME: ${COTURN_DB_NAME}
             COTURN_DB_PASSWORD: ${COTURN_DB_PASSWORD}

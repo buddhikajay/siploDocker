@@ -31,4 +31,4 @@ then
     touch /tmp/turnserver.configured
 fi
 
-exec /usr/bin/turnserver -v --syslog -a --max-bps=3000000 -f -m 3 --min-port=32355 --max-port=65535 --use-auth-secret --realm=realm --mysql-userdb="host=db dbname=${COTURN_DB_NAME} user=${COTURN_DB_USER} password=${COTURN_DB_PASSWORD} connect_timeout=30" --log-file=stdout --cipher-list=ALL --cert=default_crt.pem --pkey=default_key.pem$@
+exec /usr/bin/turnserver -v --syslog -a --max-bps=3000000 -f -m 3 --min-port=32355 --max-port=65535 --use-auth-secret --realm=realm --mysql-userdb="host=${COTURN_DB_HOST} dbname=${COTURN_DB_NAME} user=${COTURN_DB_USER} password=${COTURN_DB_PASSWORD} connect_timeout=30" --log-file=stdout --cipher-list=ALL --cert=default_crt.pem --pkey=default_key.pem$@
