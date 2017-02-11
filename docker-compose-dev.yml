@@ -99,8 +99,9 @@ services:
         links:
             - db
         environment:
-            PMA_USER: root
-            PMA_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+            PMA_HOST: ${PMA_HOST}
+            PMA_USER: ${PMA_USER}
+            PMA_PASSWORD: ${PMA_PASSWORD}
     redis:
         image: redis:alpine
         ports:
