@@ -141,6 +141,8 @@ services:
             VIRTUAL_HOST: media.${DOMAIN_NAME}
             LETSENCRYPT_HOST: media.${DOMAIN_NAME}
             LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}
+        volumes:
+            - ./signalmaster/config:/usr/src/app/config
     coturn:
         build: docker-turnserver
         image: buddhikajay/coturn
