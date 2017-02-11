@@ -13,14 +13,24 @@ COTURN_DB_USER=${COTURN_DB_USER:-coturn}
 COTURN_DB_NAME=${COTURN_DB_NAME:-coturn}
 COTURN_DB_PASSWORD=${COTURN_DB_PASSWORD:-1234}
 
-# mysqld_safe &
+#mysqld_safe &
 
-mysql -u root -p${MYSQL_ROOT_PASSWORD} -e "CREATE DATABASE IF NOT EXISTS ${WHITEBOARD_DB_NAME}"
-mysql -u root -p${MYSQL_ROOT_PASSWORD} -e "GRANT ALL ON ${WHITEBOARD_DB_NAME}.* to '${WHITEBOARD_DB_USER}'@'%' IDENTIFIED BY '${WHITEBOARD_DB_PASSWORD}'"
+mysql_ready() {
+   mysqladmin ping --host=localhost --user=root --password=MYSQL_ROOT_PASSWORD --socket=/var/run/mysqld/mysqld.sock > /dev/null 2>&1
+}
 
-mysql -u root -p${MYSQL_ROOT_PASSWORD} -e "CREATE DATABASE IF NOT EXISTS ${COTURN_DB_NAME}"
-mysql -u root -p${MYSQL_ROOT_PASSWORD} -e "GRANT ALL ON ${COTURN_DB_NAME}.* to '${COTURN_DB_USER}'@'%' IDENTIFIED BY '${COTURN_DB_PASSWORD}'"
-mysql -u root -p${MYSQL_ROOT_PASSWORD} -e \
+while !(mysql_ready)
+do
+    sleep 3
+    echo "waiting for mysql ..."
+done
+
+mysql -u root -p${MYSQL_ROOT_PASSWORD} --socket=/var/run/mysqld/mysqld.sock -e "CREATE DATABASE IF NOT EXISTS ${WHITEBOARD_DB_NAME}"
+mysql -u root -p${MYSQL_ROOT_PASSWORD} --socket=/var/run/mysqld/mysqld.sock -e "GRANT ALL ON ${WHITEBOARD_DB_NAME}.* to '${WHITEBOARD_DB_USER}'@'%' IDENTIFIED BY '${WHITEBOARD_DB_PASSWORD}'"
+
+mysql -u root -p${MYSQL_ROOT_PASSWORD} --socket=/var/run/mysqld/mysqld.sock -e "CREATE DATABASE IF NOT EXISTS ${COTURN_DB_NAME}"
+mysql -u root -p${MYSQL_ROOT_PASSWORD} --socket=/var/run/mysqld/mysqld.sock -e "GRANT ALL ON ${COTURN_DB_NAME}.* to '${COTURN_DB_USER}'@'%' IDENTIFIED BY '${COTURN_DB_PASSWORD}'"
+mysql -u root -p${MYSQL_ROOT_PASSWORD} --socket=/var/run/mysqld/mysqld.sock -e \
 "USE ${COTURN_DB_NAME};
 CREATE TABLE turnusers_lt (
     realm varchar(127) default '',
@@ -70,7 +80,7 @@ CREATE TABLE admin_user (
 );
 "
 
-mysql -u root -p${MYSQL_ROOT_PASSWORD} -e "FLUSH PRIVILEGES"
+mysql -u root -p${MYSQL_ROOT_PASSWORD} --socket=/var/run/mysqld/mysqld.sock -e "FLUSH PRIVILEGES"
 
 
 
