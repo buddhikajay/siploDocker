@@ -65,7 +65,7 @@ services:
         volumes_from:
             - php
         volumes:
-            - ./logs/nginx/:/var/log/nginx
+            - nginx_logs:/var/log/nginx
         environment:
             - VIRTUAL_HOST=${DOMAIN_NAME}
             - LETSENCRYPT_HOST=${DOMAIN_NAME}
@@ -78,20 +78,20 @@ services:
           - "443:443"
         volumes:
           - /var/run/docker.sock:/tmp/docker.sock:ro
-          - ./certs:/etc/nginx/certs
+          - ssl_certs:/etc/nginx/certs
           - /etc/nginx/certs
           - /etc/nginx/vhost.d
           - /usr/share/nginx/html
-    elk:
-        image: willdurand/elk
-        ports:
-            - 81:80
-        volumes:
-            - ./elk/logstash:/etc/logstash
-            - ./elk/logstash/patterns:/opt/logstash/patterns
-        volumes_from:
-            - php
-            - nginx
+    # elk:
+    #     image: willdurand/elk
+    #     ports:
+    #         - 81:80
+    #     volumes:
+    #         - ./elk/logstash:/etc/logstash
+    #         - ./elk/logstash/patterns:/opt/logstash/patterns
+    #     volumes_from:
+    #         - php
+    #         - nginx
     phpmyadmin:
         image: phpmyadmin/phpmyadmin
         ports:
@@ -140,8 +140,6 @@ services:
             VIRTUAL_HOST: media.${DOMAIN_NAME}
             LETSENCRYPT_HOST: media.${DOMAIN_NAME}
             LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}
-        volumes:
-            - ./signalmaster/config:/usr/src/app/config
     coturn:
         build: docker-turnserver
         image: buddhikajay/coturn
@@ -188,4 +186,6 @@ volumes:
     symfony_logs:
         driver: local
     nginx_logs:
+        driver: local
+    ssl_certs:
         driver: local
