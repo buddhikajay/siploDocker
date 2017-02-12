@@ -1,0 +1,156 @@
+version: '2'
+
+services:
+    php:
+        image: buddhikajay/siplo_e_learning
+        ports:
+            - 9000:9000
+        links:
+            - redis
+        volumes:
+            - symfony_logs:/var/www/symfony/app/logs
+        environment:
+            SYMFONY__DB__HOST: ${SYMFONY_DB_HOST}
+            SYMFONY__DB__PORT: ${SYMFONY_DB_PORT}
+            SYMFONY__DB__USER: ${SYMFONY_DB_USER}
+            SYMFONY__DB__NAME: ${SYMFONY_DB_NAME}
+            SYMFONY__DB__PASSWORD: ${SYMFONY_DB_PASSWORD}
+            SYMFONY__MAILER__TRANSPORT: ${SYMFONY_MAILER_TRANSPORT}
+            SYMFONY__MAILER__HOST: ${SYMFONY_MAILER_HOST}
+            SYMFONY__MAILER__PORT: ${SYMFONY_MAILER_PORT}
+            SYMFONY__MAILER__ENCRYPTION: ${SYMFONY_MAILER_ENCRYPTION}
+            SYMFONY__MAILER__USER: ${SYMFONY_MAILER_USER}
+            SYMFONY__MAILER__PASSWORD: ${SYMFONY_MAILER_PASSWORD} 
+            SYMFONY__SECRET: ${SYMFONY_SECRET}
+            SYMFONY__DOMAIN__NAME: ${DOMAIN_NAME}
+            SYMFONY__ADMIN__ID: ${SYMFONY_ADMIN_ID}
+            SYMFONY__PAYHERE__MERCHANT__ID: ${SYMFONY_PAYHERE_MERCHANT_ID}
+            SYMFONY__PAYHERE__CHECKOUT__URL: ${SYMFONY_PAYHERE_CHECKOUT_URL}
+            SYMFONY__PAYHERE__SECRET: ${SYMFONY_PAYHERE_SECRET}
+            SYMFONY__REDIS__HOST: ${SYMFONY_REDIS_HOST}
+            SYMFONY__REDIS__PORT: ${SYMFONY_REDIS_PORT}
+            SYMFONY__AWS__REGION: ${SYMFONY_AWS_REGION}
+            SYMFONY__AWS__ACCESS__KEY__ID: ${SYMFONY_AWS_ACCESS_KEY_ID}
+            SYMFONY__AWS__SECRET__ACCESS__KEY: ${SYMFONY_AWS_SECRET_ACCESS_KEY}
+            SYMFONY__AWS__S3__BUCKET__NAME: ${SYMFONY_AWS_S3_BUCKET_NAME}
+    nginx:
+        image: buddhikajay/nginx
+        ports:
+            - 83:80
+        links:
+            - php
+            - whiteboard
+            - media
+        volumes_from:
+            - php
+        volumes:
+            - nginx_logs:/var/log/nginx
+        environment:
+            - VIRTUAL_HOST=${DOMAIN_NAME}
+            - LETSENCRYPT_HOST=${DOMAIN_NAME}
+            - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+            # - LETSENCRYPT_TEST=true
+    nginx-proxy:
+        image: jwilder/nginx-proxy
+        container_name: nginx-proxy
+        ports:
+          - "80:80"
+          - "443:443"
+        volumes:
+          - /var/run/docker.sock:/tmp/docker.sock:ro
+          - ssl_certs:/etc/nginx/certs
+          - /etc/nginx/certs
+          - /etc/nginx/vhost.d
+          - /usr/share/nginx/html
+    # elk:
+    #     image: willdurand/elk
+    #     ports:
+    #         - 81:80
+    #     volumes_from:
+    #         - php
+    #         - nginx
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        ports:
+            - "8080:80"
+        environment:
+            PMA_HOST: ${PMA_HOST}
+            PMA_USER: ${PMA_USER}
+            PMA_PASSWORD: ${PMA_PASSWORD}
+    redis:
+        image: redis:alpine
+        ports:
+            - 6380:6379
+    whiteboard:
+        image: buddhikajay/draw
+        container_name: whiteboard
+        ports:
+            - 9002:9002
+        environment:
+            DB_TYPE: mysql
+            DB_HOST: ${WHITEBOARD_DB_HOST}
+            DB_USER: ${WHITEBOARD_DB_USER}
+            DB_PASSWORD: ${WHITEBOARD_DB_PASSWORD}
+            DB_HOST: db
+            DB_NAME: ${WHITEBOARD_DB_NAME}
+            VIRTUAL_HOST: whiteboard.${DOMAIN_NAME}
+            LETSENCRYPT_HOST: whiteboard.${DOMAIN_NAME}
+            LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}
+    media:
+        image: buddhikajay/media
+        container_name: media
+        ports:
+            - "8888:8888"
+        depends_on:
+            - coturn
+        links:
+            - coturn
+        environment:
+            TURNSERVER_HOST: ${MEDIA_TURNSERVER_HOST}
+            TURNSERVER_SECRET: ${MEDIA_TURNSERVER_SECRET}
+            TURNSERVER_EXPIERY: ${MEDIA_TURNSERVER_EXPIERY}
+            NODE_ENV: ${MEDIA_ENV}
+            VIRTUAL_HOST: media.${DOMAIN_NAME}
+            LETSENCRYPT_HOST: media.${DOMAIN_NAME}
+            LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}
+    coturn:
+        image: buddhikajay/coturn
+        container_name: coturn
+        ports:
+            - "3478:3478/udp" # STUN/TURN UDP
+            - "3478:3478/tcp" # STUN/TURN TCP
+            - "3479:3479/udp" # STUN/TURN UDP Alt port (RFC5780 support)
+            - "3479:3479/tcp" # STUN/TURN TCP Alt port (RFC5780 support)
+            - "5349:5349/udp" # STUN/TURN DTLS
+            - "5349:5349/tcp" # STUN/TURN TLS
+            - "5350:5350/udp" # STUN/TURN DTLS Alt port (RFC5780 support)
+            - "5350:5350/tcp" # STUN/TURN TLS Alt port (RFC5780 support)
+            - "49152:65535/udp" # UDP media ports for TURN relay
+        restart: always
+        environment:
+            COTURN_SECRET: ${COTURN_SECRET}
+            COTURN_DB_HOST: ${COTURN_DB_HOST}
+            COTURN_DB_USER: ${COTURN_DB_USER}
+            COTURN_DB_NAME: ${COTURN_DB_NAME}
+            COTURN_DB_PASSWORD: ${COTURN_DB_PASSWORD}
+            VIRTUAL_HOST: turn.${DOMAIN_NAME}
+            VIRTUAL_PORT: 3478
+            LETSENCRYPT_HOST: turn.${DOMAIN_NAME}
+            LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}
+    letsencrypt:
+        image: jrcs/letsencrypt-nginx-proxy-companion
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock:ro
+        volumes_from:
+            - nginx-proxy
+        # environment:
+            # - LETSENCRYPT_TEST=true
+            # - "ACME_CA_URI=https://acme-staging.api.letsencrypt.org/directory"
+
+volumes:
+    symfony_logs:
+        driver: local
+    nginx_logs:
+        driver: local
+    ssl_certs:
+        driver: local
