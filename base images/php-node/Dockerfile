@@ -20,7 +20,7 @@ npm install -g bower
 
 # Set timezone
 RUN rm /etc/localtime
-RUN ln -s /usr/share/zoneinfo/Europe/Paris /etc/localtime
+RUN ln -s /usr/share/zoneinfo/Asia/Colombo /etc/localtime
 RUN "date"
 
 # Type docker-php-ext-install to see available extensions
@@ -51,5 +51,6 @@ RUN apt-get update && apt-get install -y \
 
 RUN echo 'alias sf="php app/console"' >> ~/.bashrc
 RUN echo 'alias sf3="php bin/console"' >> ~/.bashrc
+
 
 WORKDIR /var/www/symfony
