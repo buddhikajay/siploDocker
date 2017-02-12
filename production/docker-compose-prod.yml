@@ -1,27 +1,14 @@
 version: '2'
 
 services:
-    db:
-        image: buddhikajay/siplo-mysql
-        environment:
-            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-            MYSQL_DATABASE: ${MYSQL_DATABASE}
-            MYSQL_USER: ${MYSQL_USER}
-            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-            WHITEBOARD_DB_USER: ${WHITEBOARD_DB_USER}
-            WHITEBOARD_DB_NAME: ${WHITEBOARD_DB_NAME}
-            WHITEBOARD_DB_PASSWORD: ${WHITEBOARD_DB_PASSWORD}
-            COTURN_DB_USER: ${COTURN_DB_USER}
-            COTURN_DB_NAME: ${COTURN_DB_NAME}
-            COTURN_DB_PASSWORD: ${COTURN_DB_PASSWORD}
-
     php:
         image: buddhikajay/siplo_e_learning
         ports:
             - 9000:9000
         links:
-            - db:mysqldb
             - redis
+        volumes:
+            - symfony_logs:/var/www/symfony/app/logs
         environment:
             SYMFONY__DB__HOST: ${SYMFONY_DB_HOST}
             SYMFONY__DB__PORT: ${SYMFONY_DB_PORT}
@@ -56,6 +43,8 @@ services:
             - media
         volumes_from:
             - php
+        volumes:
+            - nginx_logs:/var/log/nginx
         environment:
             - VIRTUAL_HOST=${DOMAIN_NAME}
             - LETSENCRYPT_HOST=${DOMAIN_NAME}
@@ -69,25 +58,25 @@ services:
           - "443:443"
         volumes:
           - /var/run/docker.sock:/tmp/docker.sock:ro
+          - ssl_certs:/etc/nginx/certs
           - /etc/nginx/certs
           - /etc/nginx/vhost.d
           - /usr/share/nginx/html
-    elk:
-        image: willdurand/elk
-        ports:
-            - 81:80
-        volumes_from:
-            - php
-            - nginx
+    # elk:
+    #     image: willdurand/elk
+    #     ports:
+    #         - 81:80
+    #     volumes_from:
+    #         - php
+    #         - nginx
     phpmyadmin:
         image: phpmyadmin/phpmyadmin
         ports:
             - "8080:80"
-        links:
-            - db
         environment:
-            PMA_USER: root
-            PMA_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+            PMA_HOST: ${PMA_HOST}
+            PMA_USER: ${PMA_USER}
+            PMA_PASSWORD: ${PMA_PASSWORD}
     redis:
         image: redis:alpine
         ports:
@@ -97,10 +86,9 @@ services:
         container_name: whiteboard
         ports:
             - 9002:9002
-        depends_on:
-            - db
         environment:
             DB_TYPE: mysql
+            DB_HOST: ${WHITEBOARD_DB_HOST}
             DB_USER: ${WHITEBOARD_DB_USER}
             DB_PASSWORD: ${WHITEBOARD_DB_PASSWORD}
             DB_HOST: db
@@ -127,8 +115,6 @@ services:
             LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}
     coturn:
         image: buddhikajay/coturn
-        depends_on:
-            - db
         container_name: coturn
         ports:
             - "3478:3478/udp" # STUN/TURN UDP
@@ -141,10 +127,9 @@ services:
             - "5350:5350/tcp" # STUN/TURN TLS Alt port (RFC5780 support)
             - "49152:65535/udp" # UDP media ports for TURN relay
         restart: always
-        links:
-            - db
         environment:
             COTURN_SECRET: ${COTURN_SECRET}
+            COTURN_DB_HOST: ${COTURN_DB_HOST}
             COTURN_DB_USER: ${COTURN_DB_USER}
             COTURN_DB_NAME: ${COTURN_DB_NAME}
             COTURN_DB_PASSWORD: ${COTURN_DB_PASSWORD}
@@ -158,5 +143,14 @@ services:
             - /var/run/docker.sock:/var/run/docker.sock:ro
         volumes_from:
             - nginx-proxy
-        environment:
-            - LETSENCRYPT_TEST=true
+        # environment:
+            # - LETSENCRYPT_TEST=true
+            # - "ACME_CA_URI=https://acme-staging.api.letsencrypt.org/directory"
+
+volumes:
+    symfony_logs:
+        driver: local
+    nginx_logs:
+        driver: local
+    ssl_certs:
+        driver: local

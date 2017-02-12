@@ -1,9 +1,8 @@
 # See https://github.com/docker-library/php/blob/4677ca134fe48d20c820a19becb99198824d78e3/7.0/fpm/Dockerfile
 # buddhikajay/siplo-php-node
 
-MAINTAINER Buddhika Jayawardhana <buddhika.anushka@gmail.com>
-
 FROM php:7.0-fpm
+MAINTAINER Buddhika Jayawardhana <buddhika.anushka@gmail.com>
 
 RUN apt-get update && apt-get install -y \
     git \
@@ -20,7 +19,7 @@ npm install -g bower
 
 # Set timezone
 RUN rm /etc/localtime
-RUN ln -s /usr/share/zoneinfo/Europe/Paris /etc/localtime
+RUN ln -s /usr/share/zoneinfo/Asia/Colombo /etc/localtime
 RUN "date"
 
 # Type docker-php-ext-install to see available extensions
@@ -51,5 +50,6 @@ RUN apt-get update && apt-get install -y \
 
 RUN echo 'alias sf="php app/console"' >> ~/.bashrc
 RUN echo 'alias sf3="php bin/console"' >> ~/.bashrc
+
 
 WORKDIR /var/www/symfony

@@ -5,7 +5,7 @@ services:
         build: mysql
         image: buddhikajay/siplo-mysql
         volumes:
-            - "./.data/db:/var/lib/mysql"
+            - "db_data:/var/lib/mysql"
         environment:
             MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
             MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -28,7 +28,7 @@ services:
             - redis
         volumes:
             - ./SiploELearning:/var/www/symfony
-            - ./logs/symfony:/var/www/symfony/app/logs
+            - symfony_logs:/var/www/symfony/app/logs
         environment:
             SYMFONY__DB__HOST: ${SYMFONY_DB_HOST}
             SYMFONY__DB__PORT: ${SYMFONY_DB_PORT}
@@ -65,7 +65,7 @@ services:
         volumes_from:
             - php
         volumes:
-            - ./logs/nginx/:/var/log/nginx
+            - nginx_logs:/var/log/nginx
         environment:
             - VIRTUAL_HOST=${DOMAIN_NAME}
             - LETSENCRYPT_HOST=${DOMAIN_NAME}
@@ -82,16 +82,16 @@ services:
           - /etc/nginx/certs
           - /etc/nginx/vhost.d
           - /usr/share/nginx/html
-    elk:
-        image: willdurand/elk
-        ports:
-            - 81:80
-        volumes:
-            - ./elk/logstash:/etc/logstash
-            - ./elk/logstash/patterns:/opt/logstash/patterns
-        volumes_from:
-            - php
-            - nginx
+    # elk:
+    #     image: willdurand/elk
+    #     ports:
+    #         - 81:80
+    #     volumes:
+    #         - ./elk/logstash:/etc/logstash
+    #         - ./elk/logstash/patterns:/opt/logstash/patterns
+    #     volumes_from:
+    #         - php
+    #         - nginx
     phpmyadmin:
         image: phpmyadmin/phpmyadmin
         ports:
@@ -99,8 +99,9 @@ services:
         links:
             - db
         environment:
-            PMA_USER: root
-            PMA_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+            PMA_HOST: ${PMA_HOST}
+            PMA_USER: ${PMA_USER}
+            PMA_PASSWORD: ${PMA_PASSWORD}
     redis:
         image: redis:alpine
         ports:
@@ -115,6 +116,7 @@ services:
             - db
         environment:
             DB_TYPE: mysql
+            DB_HOST: ${WHITEBOARD_DB_HOST}
             DB_USER: ${WHITEBOARD_DB_USER}
             DB_PASSWORD: ${WHITEBOARD_DB_PASSWORD}
             DB_HOST: db
@@ -161,16 +163,32 @@ services:
             - db
         environment:
             COTURN_SECRET: ${COTURN_SECRET}
+            COTURN_DB_HOST: ${COTURN_DB_HOST}
             COTURN_DB_USER: ${COTURN_DB_USER}
             COTURN_DB_NAME: ${COTURN_DB_NAME}
             COTURN_DB_PASSWORD: ${COTURN_DB_PASSWORD}
             VIRTUAL_HOST: turn.${DOMAIN_NAME}
             VIRTUAL_PORT: 3478
+            VIRTUAL_PROTO: https
             LETSENCRYPT_HOST: turn.${DOMAIN_NAME}
             LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}
-    letsencrypt:
-        image: jrcs/letsencrypt-nginx-proxy-companion
         volumes:
-            - /var/run/docker.sock:/var/run/docker.sock:ro
-        volumes_from:
-            - nginx-proxy
+            - ./docker-turnserver/turnserver.sh:/etc/service/turnserver/run
+            - ./certs/default_key.pem:/etc/service/turnserver/default_key.pem
+            - ./certs/default_crt.pem:/etc/service/turnserver/default_crt.pem
+    # letsencrypt:
+    #     image: jrcs/letsencrypt-nginx-proxy-companion
+    #     volumes:
+    #         - /var/run/docker.sock:/var/run/docker.sock:ro
+    #     volumes_from:
+    #         - nginx-proxy
+
+volumes:
+    db_data:
+        driver: local
+    symfony_logs:
+        driver: local
+    nginx_logs:
+        driver: local
+    ssl_certs:
+        driver: local
