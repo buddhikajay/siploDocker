@@ -1,28 +1,11 @@
 version: '2'
 
 services:
-    db:
-        image: buddhikajay/siplo-mysql
-        volumes:
-            - "db_data:/var/lib/mysql"
-        environment:
-            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-            MYSQL_DATABASE: ${MYSQL_DATABASE}
-            MYSQL_USER: ${MYSQL_USER}
-            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-            WHITEBOARD_DB_USER: ${WHITEBOARD_DB_USER}
-            WHITEBOARD_DB_NAME: ${WHITEBOARD_DB_NAME}
-            WHITEBOARD_DB_PASSWORD: ${WHITEBOARD_DB_PASSWORD}
-            COTURN_DB_USER: ${COTURN_DB_USER}
-            COTURN_DB_NAME: ${COTURN_DB_NAME}
-            COTURN_DB_PASSWORD: ${COTURN_DB_PASSWORD}
-
     php:
         image: buddhikajay/siplo_e_learning
         ports:
             - 9000:9000
         links:
-            - db:mysqldb
             - redis
         volumes:
             - symfony_logs:/var/www/symfony/app/logs
@@ -90,11 +73,10 @@ services:
         image: phpmyadmin/phpmyadmin
         ports:
             - "8080:80"
-        links:
-            - db
         environment:
-            PMA_USER: root
-            PMA_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+            PMA_HOST: ${PMA_HOST}
+            PMA_USER: ${PMA_USER}
+            PMA_PASSWORD: ${PMA_PASSWORD}
     redis:
         image: redis:alpine
         ports:
@@ -104,8 +86,6 @@ services:
         container_name: whiteboard
         ports:
             - 9002:9002
-        depends_on:
-            - db
         environment:
             DB_TYPE: mysql
             DB_HOST: ${WHITEBOARD_DB_HOST}
@@ -135,8 +115,6 @@ services:
             LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}
     coturn:
         image: buddhikajay/coturn
-        depends_on:
-            - db
         container_name: coturn
         ports:
             - "3478:3478/udp" # STUN/TURN UDP
@@ -149,8 +127,6 @@ services:
             - "5350:5350/tcp" # STUN/TURN TLS Alt port (RFC5780 support)
             - "49152:65535/udp" # UDP media ports for TURN relay
         restart: always
-        links:
-            - db
         environment:
             COTURN_SECRET: ${COTURN_SECRET}
             COTURN_DB_HOST: ${COTURN_DB_HOST}
@@ -172,8 +148,6 @@ services:
             - "ACME_CA_URI=https://acme-staging.api.letsencrypt.org/directory"
 
 volumes:
-    db_data:
-        driver: local
     symfony_logs:
         driver: local
     nginx_logs:
