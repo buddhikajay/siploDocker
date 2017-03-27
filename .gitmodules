@@ -7,3 +7,6 @@
 [submodule "signalmaster"]
 	path = signalmaster
 	url = https://github.com/buddhikajay/signalmaster.git
+[submodule "RichFilemanager"]
+	path = RichFilemanager
+	url = https://github.com/buddhikajay/RichFilemanager.git
