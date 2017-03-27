@@ -1,4 +1,4 @@
-#buddhikajay/nginx
+#buddhikajay/nginx-files
 FROM debian:jessie
 
 MAINTAINER Buddhika Jayawardhana <buddhika.anushka@gmail.com>
