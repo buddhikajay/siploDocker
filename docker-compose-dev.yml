@@ -71,7 +71,8 @@ services:
             - LETSENCRYPT_HOST=${DOMAIN_NAME}
             - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
     nginx-proxy:
-        image: jwilder/nginx-proxy
+        build: nginx-proxy
+        image: buddhikajay/nginx-proxy
         container_name: nginx-proxy
         ports:
           - "80:80"
@@ -82,16 +83,16 @@ services:
           - /etc/nginx/certs
           - /etc/nginx/vhost.d
           - /usr/share/nginx/html
-    # elk:
-    #     image: willdurand/elk
-    #     ports:
-    #         - 81:80
-    #     volumes:
-    #         - ./elk/logstash:/etc/logstash
-    #         - ./elk/logstash/patterns:/opt/logstash/patterns
-    #     volumes_from:
-    #         - php
-    #         - nginx
+    elk:
+        image: willdurand/elk
+        ports:
+            - 81:80
+        volumes:
+            - ./elk/logstash:/etc/logstash
+            - ./elk/logstash/patterns:/opt/logstash/patterns
+        volumes_from:
+            - php
+            - nginx
     phpmyadmin:
         image: phpmyadmin/phpmyadmin
         ports:
@@ -182,6 +183,37 @@ services:
     #         - /var/run/docker.sock:/var/run/docker.sock:ro
     #     volumes_from:
     #         - nginx-proxy
+    file-manager:
+        build: RichFilemanager
+        image: buddhikajay/rich-file-manager
+        container_name: file-manager
+        volumes:
+            # - /var/www/RichFilemanager
+            - ./RichFilemanager:/var/www/RichFilemanager
+        environment:
+            AWS_REGION: ${SYMFONY_AWS_REGION}
+            AWS_BUCKET: ${SYMFONY_AWS_S3_BUCKET_NAME}
+            AWS_KEY: ${SYMFONY_AWS_ACCESS_KEY_ID}
+            AWS_SECRET: ${SYMFONY_AWS_SECRET_ACCESS_KEY}
+
+    nginx-files:
+        build: nginx-files
+        image: buddhikajay/nginx-files
+        container_name: nginx-files
+        ports:
+            - 84:80
+        depends_on:
+            - file-manager
+        links:
+            - file-manager
+        volumes_from:
+            - file-manager
+        volumes:
+            - nginx_logs:/var/log/nginx
+        environment:
+            VIRTUAL_HOST: files.${DOMAIN_NAME}
+            LETSENCRYPT_HOST: files.${DOMAIN_NAME}
+            LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}
 
 volumes:
     db_data:
