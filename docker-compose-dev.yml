@@ -53,6 +53,9 @@ services:
             SYMFONY__AWS__ACCESS__KEY__ID: ${SYMFONY_AWS_ACCESS_KEY_ID}
             SYMFONY__AWS__SECRET__ACCESS__KEY: ${SYMFONY_AWS_SECRET_ACCESS_KEY}
             SYMFONY__AWS__S3__BUCKET__NAME: ${SYMFONY_AWS_S3_BUCKET_NAME}
+            SYMFONY__GOS__WEBSOCKET__HOST: ${SYMFONY_GOS_WEBSOCKET_HOST}
+            SYMFONY__GOS__WEBSOCKET__PORT: ${SYMFONY_GOS_WEBSOCKET_PORT}
+
     nginx:
         build: nginx
         image: buddhikajay/nginx
