@@ -213,6 +213,7 @@ services:
             - file-manager
         volumes:
             - nginx_logs:/var/log/nginx
+            - ./nginx-files/files.conf:/etc/nginx/sites-available/files.conf
         environment:
             VIRTUAL_HOST: files.${DOMAIN_NAME}
             LETSENCRYPT_HOST: files.${DOMAIN_NAME}
