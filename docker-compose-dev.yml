@@ -128,6 +128,9 @@ services:
             VIRTUAL_HOST: whiteboard.${DOMAIN_NAME}
             LETSENCRYPT_HOST: whiteboard.${DOMAIN_NAME}
             LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}
+        volumes:
+            - ./draw/public:/usr/src/app/public
+            - ./draw/views:/usr/src/app/views
     media:
         build: signalmaster
         image: buddhikajay/media
