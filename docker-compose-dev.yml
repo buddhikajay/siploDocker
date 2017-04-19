@@ -128,6 +128,9 @@ services:
             VIRTUAL_HOST: whiteboard.${DOMAIN_NAME}
             LETSENCRYPT_HOST: whiteboard.${DOMAIN_NAME}
             LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}
+        volumes:
+            - ./draw/public:/usr/src/app/public
+            - ./draw/views:/usr/src/app/views
     media:
         build: signalmaster
         image: buddhikajay/media
@@ -213,6 +216,7 @@ services:
             - file-manager
         volumes:
             - nginx_logs:/var/log/nginx
+            - ./nginx-files/files.conf:/etc/nginx/sites-available/files.conf
         environment:
             VIRTUAL_HOST: files.${DOMAIN_NAME}
             LETSENCRYPT_HOST: files.${DOMAIN_NAME}
